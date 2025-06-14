@@ -3,200 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Реальный гороскоп для Telegram бота</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <title>Гороскоп на сегодня</title>
     <style>
-        :root {
-            --primary: #6a5acd;
-            --secondary: #9370db;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --success: #4caf50;
-            --error: #f44336;
-        }
-        
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
-            line-height: 1.6;
         }
         
         .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
         }
         
         header {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: white;
-            padding: 25px;
             text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         h1 {
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
         
         .date {
+            font-size: 1.2rem;
             opacity: 0.9;
-            font-size: 1rem;
         }
         
-        .sign-selector {
+        .zodiac-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
-            padding: 25px;
+            margin-bottom: 30px;
         }
         
-        .sign-btn {
-            background: white;
-            border: 2px solid #e0e0e0;
+        .zodiac-card {
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 15px;
-            padding: 15px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding: 20px 10px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .sign-btn:hover {
+        .zodiac-card:hover {
+            background: rgba(255, 255, 255, 0.25);
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-color: var(--secondary);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         
-        .sign-btn.active {
-            background-color: #f0f0ff;
-            border-color: var(--primary);
-        }
-        
-        .sign-icon {
-            font-size: 2.5rem;
+        .zodiac-symbol {
+            font-size: 3rem;
             margin-bottom: 10px;
         }
         
-        .sign-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        
         .horoscope-container {
-            padding: 0 25px 25px;
-            min-height: 200px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
         }
         
-        .horoscope-card {
-            background: var(--light);
-            border-radius: 15px;
-            padding: 20px;
-        }
-        
-        .selected-sign {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .selected-icon {
-            font-size: 2rem;
-            margin-right: 15px;
-        }
-        
-        .selected-name {
-            font-size: 1.5rem;
-            font-weight: 600;
+        .horoscope-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffeb3b;
         }
         
         .horoscope-text {
-            line-height: 1.6;
             font-size: 1.1rem;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        
+        .back-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
         
         .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 0;
-        }
-        
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: var(--primary);
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            background-color: #ffebee;
-            color: var(--error);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
             text-align: center;
-        }
-        
-        .period-selector {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .period-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 20px;
-            background-color: #e0e0e0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .period-btn.active {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #6c757d;
-            font-size: 0.9rem;
-            border-top: 1px solid #eee;
+            padding: 40px;
+            font-size: 1.2rem;
         }
         
         @media (max-width: 600px) {
-            .sign-selector {
+            .zodiac-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .sign-btn {
-                padding: 12px 8px;
+            h1 {
+                font-size: 2rem;
             }
         }
     </style>
@@ -204,240 +136,107 @@
 <body>
     <div class="container">
         <header>
-            <h1>✨ Персональный гороскоп</h1>
-            <div class="date" id="current-date"></div>
+            <h1>✨ Гороскоп на сегодня</h1>
+            <div class="date" id="currentDate"></div>
         </header>
         
-        <div class="period-selector">
-            <button class="period-btn active" data-period="today">Сегодня</button>
-            <button class="period-btn" data-period="tomorrow">Завтра</button>
-            <button class="period-btn" data-period="week">Неделя</button>
+        <div class="zodiac-grid" id="zodiacGrid">
+            <!-- Знаки зодиака будут добавлены через JS -->
         </div>
         
-        <div class="sign-selector">
-            <!-- Знаки зодиака -->
-            <div class="sign-btn" data-sign="aries">
-                <div class="sign-icon">♈</div>
-                <div class="sign-name">Овен</div>
-            </div>
-            <div class="sign-btn" data-sign="taurus">
-                <div class="sign-icon">♉</div>
-                <div class="sign-name">Телец</div>
-            </div>
-            <div class="sign-btn" data-sign="gemini">
-                <div class="sign-icon">♊</div>
-                <div class="sign-name">Близнецы</div>
-            </div>
-            <div class="sign-btn" data-sign="cancer">
-                <div class="sign-icon">♋</div>
-                <div class="sign-name">Рак</div>
-            </div>
-            <div class="sign-btn" data-sign="leo">
-                <div class="sign-icon">♌</div>
-                <div class="sign-name">Лев</div>
-            </div>
-            <div class="sign-btn" data-sign="virgo">
-                <div class="sign-icon">♍</div>
-                <div class="sign-name">Дева</div>
-            </div>
-            <div class="sign-btn" data-sign="libra">
-                <div class="sign-icon">♎</div>
-                <div class="sign-name">Весы</div>
-            </div>
-            <div class="sign-btn" data-sign="scorpio">
-                <div class="sign-icon">♏</div>
-                <div class="sign-name">Скорпион</div>
-            </div>
-            <div class="sign-btn" data-sign="sagittarius">
-                <div class="sign-icon">♐</div>
-                <div class="sign-name">Стрелец</div>
-            </div>
-            <div class="sign-btn" data-sign="capricorn">
-                <div class="sign-icon">♑</div>
-                <div class="sign-name">Козерог</div>
-            </div>
-            <div class="sign-btn" data-sign="aquarius">
-                <div class="sign-icon">♒</div>
-                <div class="sign-name">Водолей</div>
-            </div>
-            <div class="sign-btn" data-sign="pisces">
-                <div class="sign-icon">♓</div>
-                <div class="sign-name">Рыбы</div>
-            </div>
-        </div>
-        
-        <div class="horoscope-container">
-            <div class="horoscope-card">
-                <div class="selected-sign">
-                    <div class="selected-icon" id="selected-icon">✨</div>
-                    <div class="selected-name" id="selected-name">Выберите знак зодиака</div>
-                </div>
-                <div class="horoscope-text" id="horoscope-text">
-                    После выбора знака зодиака здесь появится ваш персональный гороскоп
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            Гороскоп предоставлен вашим ботом • Обновляется ежедневно
+        <div class="horoscope-container" id="horoscopeContainer">
+            <div class="horoscope-title" id="horoscopeTitle"></div>
+            <div class="horoscope-text" id="horoscopeText"></div>
+            <button class="back-button" onclick="showZodiacGrid()">◀️ Выбрать другой знак</button>
         </div>
     </div>
 
     <script>
-        // Установка текущей даты
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('current-date').textContent = now.toLocaleDateString('ru-RU', options);
-        
-        // Переменные состояния
-        let currentSign = null;
-        let currentPeriod = 'today';
-        
-        // Элементы интерфейса
-        const selectedIcon = document.getElementById('selected-icon');
-        const selectedName = document.getElementById('selected-name');
-        const horoscopeText = document.getElementById('horoscope-text');
-        
-        // API для гороскопов
-        const HOROSCOPE_API = {
-            today: "https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily",
-            tomorrow: "https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily",
-            week: "https://horoscope-app-api.vercel.app/api/v1/get-horoscope/weekly"
-        };
-        
-        // Иконки знаков зодиака
-        const SIGN_ICONS = {
-            aries: "♈",
-            taurus: "♉",
-            gemini: "♊",
-            cancer: "♋",
-            leo: "♌",
-            virgo: "♍",
-            libra: "♎",
-            scorpio: "♏",
-            sagittarius: "♐",
-            capricorn: "♑",
-            aquarius: "♒",
-            pisces: "♓"
-        };
-        
-        // Русские названия знаков
-        const SIGN_NAMES = {
-            aries: "Овен",
-            taurus: "Телец",
-            gemini: "Близнецы",
-            cancer: "Рак",
-            leo: "Лев",
-            virgo: "Дева",
-            libra: "Весы",
-            scorpio: "Скорпион",
-            sagittarius: "Стрелец",
-            capricorn: "Козерог",
-            aquarius: "Водолей",
-            pisces: "Рыбы"
-        };
-        
-        // Обработка выбора знака зодиака
-        document.querySelectorAll('.sign-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const sign = button.getAttribute('data-sign');
-                currentSign = sign;
-                
-                // Убираем активность со всех кнопок
-                document.querySelectorAll('.sign-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Добавляем активность текущей кнопке
-                button.classList.add('active');
-                
-                // Обновляем отображаемый знак
-                selectedIcon.textContent = SIGN_ICONS[sign];
-                selectedName.textContent = SIGN_NAMES[sign];
-                
-                // Загружаем гороскоп
-                loadHoroscope(sign, currentPeriod);
-            });
+        // Текущая дата
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ru-RU', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
         
-        // Обработка выбора периода
-        document.querySelectorAll('.period-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const period = button.getAttribute('data-period');
-                currentPeriod = period;
-                
-                // Убираем активность со всех кнопок
-                document.querySelectorAll('.period-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Добавляем активность текущей кнопке
-                button.classList.add('active');
-                
-                // Загружаем гороскоп, если знак уже выбран
-                if (currentSign) {
-                    loadHoroscope(currentSign, period);
-                }
-            });
-        });
+        // Знаки зодиака
+        const zodiacSigns = {
+            'aries': { symbol: '♈', name: 'Овен' },
+            'taurus': { symbol: '♉', name: 'Телец' },
+            'gemini': { symbol: '♊', name: 'Близнецы' },
+            'cancer': { symbol: '♋', name: 'Рак' },
+            'leo': { symbol: '♌', name: 'Лев' },
+            'virgo': { symbol: '♍', name: 'Дева' },
+            'libra': { symbol: '♎', name: 'Весы' },
+            'scorpio': { symbol: '♏', name: 'Скорпион' },
+            'sagittarius': { symbol: '♐', name: 'Стрелец' },
+            'capricorn': { symbol: '♑', name: 'Козерог' },
+            'aquarius': { symbol: '♒', name: 'Водолей' },
+            'pisces': { symbol: '♓', name: 'Рыбы' }
+        };
         
-        // Функция загрузки гороскопа
-        async function loadHoroscope(sign, period) {
-            // Показываем индикатор загрузки
-            horoscopeText.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+        // Заполняем сетку знаков зодиака
+        const zodiacGrid = document.getElementById('zodiacGrid');
+        for (const [key, value] of Object.entries(zodiacSigns)) {
+            const card = document.createElement('div');
+            card.className = 'zodiac-card';
+            card.innerHTML = `
+                <div class="zodiac-symbol">${value.symbol}</div>
+                <div class="zodiac-name">${value.name}</div>
+            `;
+            card.addEventListener('click', () => loadHoroscope(key));
+            zodiacGrid.appendChild(card);
+        }
+        
+        // Загрузка гороскопа
+        async function loadHoroscope(sign) {
+            const grid = document.getElementById('zodiacGrid');
+            const container = document.getElementById('horoscopeContainer');
+            const title = document.getElementById('horoscopeTitle');
+            const text = document.getElementById('horoscopeText');
+            
+            grid.style.display = 'none';
+            container.style.display = 'block';
+            title.textContent = `Гороскоп для ${zodiacSigns[sign].name} ${zodiacSigns[sign].symbol}`;
+            text.innerHTML = '<div class="loading">Загружаем гороскоп... ✨</div>';
             
             try {
-                // Формируем URL запроса
-                const url = `${HOROSCOPE_API[period]}?sign=${sign}&day=${period === 'week' ? 'WEEK' : 'TODAY'}&lang=ru`;
+                // Используем CORS прокси для обхода ограничений
+                const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(`https://horo.mail.ru/prediction/${sign}/today/`)}`);
+                const html = await response.text();
                 
-                // Выполняем запрос
-                const response = await fetch(url);
+                // Парсим HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
                 
-                if (!response.ok) {
-                    throw new Error(`Ошибка API: ${response.status}`);
-                }
+                // Извлекаем заголовок и текст
+                const horoscopeTitle = doc.querySelector('.hdr__inner')?.textContent || 'Гороскоп';
+                const horoscopeContent = doc.querySelector('.article__text');
                 
-                const data = await response.json();
-                
-                // Проверяем успешность запроса
-                if (!data.success) {
-                    throw new Error('Не удалось получить гороскоп');
-                }
-                
-                // Отображаем гороскоп
-                let horoscopeData;
-                
-                if (period === 'week') {
-                    // Для недельного гороскопа объединяем все дни
-                    horoscopeData = data.data.horoscope_data.join('<br><br>');
+                let horoscopeHTML = '';
+                if (horoscopeContent) {
+                    horoscopeContent.querySelectorAll('p').forEach(p => {
+                        horoscopeHTML += `<p>${p.textContent}</p>`;
+                    });
                 } else {
-                    // Для дневного гороскопа
-                    horoscopeData = data.data.horoscope_data;
+                    horoscopeHTML = '<p>Гороскоп не найден. Пожалуйста, попробуйте позже.</p>';
                 }
                 
-                horoscopeText.innerHTML = horoscopeData;
-                
-            } catch (error) {
-                console.error('Ошибка при загрузке гороскопа:', error);
-                horoscopeText.innerHTML = `
-                    <div class="error-message">
-                        Не удалось загрузить гороскоп. Пожалуйста, попробуйте позже.<br>
-                        <small>${error.message}</small>
-                    </div>
+                text.innerHTML = `
+                    <h2 class="horoscope-title">${horoscopeTitle}</h2>
+                    ${horoscopeHTML}
                 `;
+            } catch (error) {
+                console.error('Ошибка:', error);
+                text.innerHTML = '<p>Не удалось загрузить гороскоп. Пожалуйста, попробуйте позже.</p>';
             }
         }
         
-        // Попробуем получить знак из URL, например: ?sign=taurus
-        const urlParams = new URLSearchParams(window.location.search);
-        const defaultSign = urlParams.get('sign');
-        
-        if (defaultSign) {
-            // Найти кнопку с этим знаком и симулировать клик
-            const button = document.querySelector(`.sign-btn[data-sign="${defaultSign}"]`);
-            if (button) {
-                button.click();
-            }
+        // Возврат к выбору знака
+        function showZodiacGrid() {
+            document.getElementById('zodiacGrid').style.display = 'grid';
+            document.getElementById('horoscopeContainer').style.display = 'none';
         }
     </script>
 </body>
